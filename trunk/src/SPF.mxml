@@ -103,9 +103,10 @@
 			{
 				for each (var file:File in e.files)
 				{
-					if (file.isDirectory && imageDirectories[file.name] == null)
+					file.canonicalize();
+					if (file.isDirectory && imageDirectories[file.nativePath] == null)
 					{
-						imageDirectories[file.name] = "_";
+						imageDirectories[file.nativePath] = "_";
 						file.addEventListener(FileListEvent.DIRECTORY_LISTING, onDirectoryListing);
 						file.getDirectoryListingAsync();
 					}
