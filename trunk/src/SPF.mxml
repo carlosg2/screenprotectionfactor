@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" backgroundColor="#ffffff" creationComplete="init();">
+	<mx:Script>
+		<![CDATA[
+			import flash.net.registerClassAlias;
+			import flash.filesystem.*;
+			import com.adobe.spf.ScreenSaver;
+			
+			[Bindable] private var picFolder:File;
+			[Bindable] private var idleInterval:uint;
+			[Bindable] private var pictureTransitionInterval:uint;
+			
+			private var imageFiles:Array;
+			private var screenSavers:Array;
+			private var imageDirectories:Object;
+			
+			private function init():void
+			{
+				screenSavers = new Array();
+				imageFiles = new Array();
+				imageDirectories = new Object();
+
+				NativeApplication.nativeApplication.addEventListener(Event.USER_IDLE, start);
+				NativeApplication.nativeApplication.addEventListener(Event.USER_PRESENT, stop);
+
+				flash.net.registerClassAlias("flash.geom.Rectangle", flash.geom.Rectangle);
+				flash.net.registerClassAlias("flash.geom.Point", flash.geom.Point);
+
+				this.restorePreferences();
+				this.addEventListener(Event.CLOSING, savePreferences);
+
+				onIdleIntervalChange();
+			}
+
+			private function savePreferences(e:Event):void
+			{
+				var prefs:Object = new Object();
+				prefs.idleInterval = this.idleInterval;
+				prefs.pictureTransitionInterval = this.pictureTransitionInterval;
+				prefs.bounds = this.bounds;
+				prefs.picFolderPath = this.picFolder.nativePath;
+				var prefsFile:File = File.applicationStorageDirectory.resolvePath("prefs.obj");
+				var fs:FileStream = new FileStream();
+				fs.open(prefsFile, FileMode.WRITE);
+				fs.writeObject(prefs);
+				fs.close();
+			}
+			
+			private function restorePreferences():void
+			{
+				var prefsFile:File = File.applicationStorageDirectory.resolvePath("prefs.obj");
+				if (prefsFile.exists)
+				{
+					var fs:FileStream = new FileStream();
+					fs.open(prefsFile, FileMode.READ);
+					var prefs:Object = fs.readObject();
+					fs.close();
+					this.idleInterval = prefs.idleInterval;
+					this.pictureTransitionInterval = prefs.pictureTransitionInterval;
+					this.bounds = Rectangle(prefs.bounds);
+					this.picFolder = new File(prefs.picFolderPath);
+				}
+				else // Defaults
+				{
+					this.idleInterval = 3;
+					this.pictureTransitionInterval = 5;
+					this.picFolder = (File.documentsDirectory.resolvePath("My Pictures").exists) ? File.documentsDirectory.resolvePath("My Pictures") : File.userDirectory.resolvePath("Pictures");
+				}
+				this.picFolder.addEventListener(Event.SELECT, onDirectorySelected);
+				this.picFolder.addEventListener(FileListEvent.DIRECTORY_LISTING, onDirectoryListing);
+				this.picFolder.getDirectoryListingAsync();
+			}
+
+			private function onPresenceChange(e:Event):void
+			{
+				if (NativeApplication.nativeApplication.timeSinceLastUserInput > 0)
+				{
+					start();
+				}
+				else
+				{
+					stop();
+				}
+			}
+			
+			private function onDirectorySelected(e:Event):void
+			{
+				picFolderPath.text = picFolder.nativePath;
+				if (!picFolder.isDirectory) return;
+				imageFiles = new Array();
+				imageDirectories = new Object();
+				picFolder.addEventListener(FileListEvent.DIRECTORY_LISTING, onDirectoryListing);
+				picFolder.getDirectoryListingAsync();
+			}
+			
+			private function onBrowseForPictureFolder():void
+			{
+				picFolder.browseForDirectory("Choose a directory with images");
+			}
+			
+			private function onDirectoryListing(e:FileListEvent):void
+			{
+				for each (var file:File in e.files)
+				{
+					if (file.isDirectory && imageDirectories[file.nativePath] == null)
+					{
+						imageDirectories[file.nativePath] = "_";
+						file.addEventListener(FileListEvent.DIRECTORY_LISTING, onDirectoryListing);
+						file.getDirectoryListingAsync();
+					}
+					else
+					{
+						if (file.extension!= null &&
+							(file.extension.toLowerCase() == "jpg" ||
+							file.extension.toLowerCase() == "jpeg" ||
+							file.extension.toLowerCase() == "gif" ||
+							file.extension.toLowerCase() == "png"))
+						{
+							imageFiles.push(file);
+						}
+					}
+				}
+				validateImageFileLength();
+			}
+			
+			private function onIdleIntervalChange():void
+			{
+				switch (idleInterval)
+				{
+					case 1:
+						NativeApplication.nativeApplication.idleThreshold = 180;
+						break;
+					case 2:
+						NativeApplication.nativeApplication.idleThreshold = 300;
+						break;
+					case 3:
+						NativeApplication.nativeApplication.idleThreshold = 900;
+						break;
+					case 4:
+						NativeApplication.nativeApplication.idleThreshold = 1800;
+						break;
+					case 5:
+						NativeApplication.nativeApplication.idleThreshold = 3200;
+						break;
+					case 6:
+						NativeApplication.nativeApplication.idleThreshold = 6400;
+						break;
+				}
+			}
+
+			private function validateImageFileLength():void
+			{
+				if (imageFiles.length < 3)
+				{
+					statusMessage.setStyle("color", 0xff0000);
+					statusMessage.text = "SPF is inactive. Your image directory must contain at least 2 images.";
+					testButton.enabled = false;
+					NativeApplication.nativeApplication.removeEventListener(Event.USER_IDLE, start);
+					NativeApplication.nativeApplication.removeEventListener(Event.USER_PRESENT, stop);
+				}
+				else
+				{
+					statusMessage.setStyle("color", 0x000000);
+					statusMessage.text = "SPF is active. " + imageFiles.length + " images found.";
+					testButton.enabled = true;
+					NativeApplication.nativeApplication.addEventListener(Event.USER_IDLE, start);
+					NativeApplication.nativeApplication.addEventListener(Event.USER_PRESENT, stop);
+				}
+			}
+
+			private function start(e:Event = null):void
+			{
+				if (screenSavers.length > 0) return;
+				for each (var screen:Screen in Screen.screens)
+				{
+					var ss:ScreenSaver = new ScreenSaver(this, imageFiles, pictureTransitionInterval);
+					ss.bounds = screen.bounds;
+					screenSavers.push(ss);
+				}
+			}
+			
+			public function stop(e:Event = null):void
+			{
+				for each (var ss:ScreenSaver in screenSavers)
+				{
+					if (!ss.closed) ss.close();
+				}
+				screenSavers = new Array();
+			}
+		]]>
+	</mx:Script>
+	<mx:VBox width="100%" height="100%">
+		<mx:Form width="100%" height="100%">
+			<mx:FormItem label="Status" width="100%">
+				<mx:Label id="statusMessage" fontWeight="bold"/>
+			</mx:FormItem>
+			<mx:FormItem label="Picture Folder" width="100%">
+				<mx:VBox width="100%">
+					<mx:Label id="picFolderPath" text="{picFolder.nativePath}"/>
+					<mx:Button label="Change Picture Folder" click="onBrowseForPictureFolder();"/>				
+				</mx:VBox>
+			</mx:FormItem>
+			<mx:FormItem label="Transition Interval" width="100%">
+					<mx:HSlider id="pictureIntervalInput"
+								minimum="1"
+								maximum="10"
+								value="{pictureTransitionInterval}"
+								snapInterval="1"
+								labels="['1 sec','10']"
+								dataTipPlacement="top"
+								tickInterval="1"
+								change="pictureTransitionInterval = pictureIntervalInput.value"/>				
+			</mx:FormItem>
+			<mx:FormItem label="Idle Interval" width="100%">
+				<mx:HSlider id="idleIntervalInput"
+							minimum="1"
+							maximum="6"
+							value="{idleInterval}"
+							snapInterval="1"
+							labels="['3', '5', '15', '30', '1hr', '2hr']"
+							dataTipPlacement="top"
+							tickInterval="1"
+							change="idleInterval = idleIntervalInput.value; onIdleIntervalChange();"/>				
+			</mx:FormItem>
+			<mx:FormItem>
+				<mx:Button id="testButton" label="Test" click="start();"/>
+			</mx:FormItem>
+		</mx:Form>
+	</mx:VBox>
+</mx:WindowedApplication>

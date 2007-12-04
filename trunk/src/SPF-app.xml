@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns="http://ns.adobe.com/air/application/1.0.M6">
+	<id>SPF</id>
+	<filename>SPF</filename>
+	<name>SPF</name>
+	<version>v1</version>
+	<description>A simple screensaver. Created by Christian Cantrell.</description>
+	<copyright>Copyright © 2007 Adobe Systems Incorporated. All rights reserved.</copyright>
+
+	<initialWindow>
+		<content>[This value will be overwritten by Flex Builder in the output app.xml]</content>
+		<title>SPF</title>
+		<systemChrome>standard</systemChrome>
+		<transparent>false</transparent>
+		<visible>true</visible>
+		<!--<minimizable></minimizable>-->
+		<!--<maximizable></maximizable>-->
+		<!--<resizable></resizable>-->
+		<width>400</width>
+		<height>275</height>
+		<!-- <x></x> -->
+		<!-- <y></y> -->
+		<!-- <minSize></minSize> -->
+		<!-- <maxSize></maxSize> -->
+	</initialWindow>
+
+	<installFolder>AIR Examples</installFolder>
+	<programMenuFolder>AIR Examples</programMenuFolder>
+
+	<icon>
+		<image128x128>icons/AIRApp_128.png</image128x128>
+	</icon>
+
+	<!-- <customUpdateUI></customUpdateUI> -->
+	<!-- <allowBrowserInvocation></allowBrowserInvocation> -->
+
+	<!-- <fileTypes> -->
+		<!-- <fileType> -->
+			<!-- <name></name> -->
+			<!-- <extension></extension> -->
+			<!-- <description></description> -->
+			<!-- <contentType></contentType> -->
+			<!-- <icon>
+				<image16x16></image16x16>
+				<image32x32></image32x32>
+				<image48x48></image48x48>
+				<image128x128></image128x128>
+			</icon> -->
+		<!-- </fileType> -->
+	<!-- </fileTypes> -->
+
+</application>
