@@ -66,6 +66,7 @@
 					this.pictureTransitionInterval = 5;
 					this.picFolder = (File.documentsDirectory.resolvePath("My Pictures").exists) ? File.documentsDirectory.resolvePath("My Pictures") : File.userDirectory.resolvePath("Pictures");
 				}
+				picFolderPath.text = picFolder.nativePath;
 				this.picFolder.addEventListener(Event.SELECT, onDirectorySelected);
 				this.picFolder.addEventListener(FileListEvent.DIRECTORY_LISTING, onDirectoryListing);
 				this.picFolder.getDirectoryListingAsync();
@@ -102,9 +103,9 @@
 			{
 				for each (var file:File in e.files)
 				{
-					if (file.isDirectory && imageDirectories[file.nativePath] == null)
+					if (file.isDirectory && imageDirectories[file.name] == null)
 					{
-						imageDirectories[file.nativePath] = "_";
+						imageDirectories[file.name] = "_";
 						file.addEventListener(FileListEvent.DIRECTORY_LISTING, onDirectoryListing);
 						file.getDirectoryListingAsync();
 					}
@@ -196,7 +197,7 @@
 			</mx:FormItem>
 			<mx:FormItem label="Picture Folder" width="100%">
 				<mx:VBox width="100%">
-					<mx:Label id="picFolderPath" text="{picFolder.nativePath}"/>
+					<mx:Label id="picFolderPath"/>
 					<mx:Button label="Change Picture Folder" click="onBrowseForPictureFolder();"/>				
 				</mx:VBox>
 			</mx:FormItem>
