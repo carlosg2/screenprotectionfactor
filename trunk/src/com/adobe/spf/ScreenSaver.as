@@ -36,14 +36,10 @@ package com.adobe.spf
 
 			// Configure the parent window
 			var initOpts:NativeWindowInitOptions = new NativeWindowInitOptions();
-			initOpts.type = NativeWindowType.NORMAL;
+			initOpts.type = NativeWindowType.LIGHTWEIGHT;
 			initOpts.systemChrome = NativeWindowSystemChrome.NONE;
 			super(initOpts);
 
-			// Configure this window
-			this.alwaysInFront = true;
-			this.stage.displayState = StageDisplayState.FULL_SCREEN;
-			this.visible = true;
 			this.stage.align = StageAlign.TOP_LEFT;
 			this.stage.scaleMode = StageScaleMode.NO_SCALE;
 			this.stage.addEventListener(MouseEvent.MOUSE_DOWN, spf.stop);
@@ -56,6 +52,7 @@ package com.adobe.spf
 				});
 			
 			start();
+
 		}
 		
 		private function start():void

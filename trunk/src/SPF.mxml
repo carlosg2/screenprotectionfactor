@@ -176,7 +176,10 @@
 				for each (var screen:Screen in Screen.screens)
 				{
 					var ss:ScreenSaver = new ScreenSaver(this, imageFiles, pictureTransitionInterval);
-					ss.bounds = screen.bounds;
+					ss.bounds = screen.visibleBounds;
+					ss.alwaysInFront = true;
+					ss.stage.displayState = StageDisplayState.FULL_SCREEN;
+					ss.visible = true;
 					screenSavers.push(ss);
 				}
 			}
@@ -185,7 +188,11 @@
 			{
 				for each (var ss:ScreenSaver in screenSavers)
 				{
-					if (!ss.closed) ss.close();
+					if (!ss.closed)
+					{
+						ss.stage.displayState = StageDisplayState.NORMAL;
+						ss.close();
+					}
 				}
 				screenSavers = new Array();
 			}
