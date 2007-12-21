@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<application xmlns="http://ns.adobe.com/air/application/1.0.M6">
-	<id>SPF</id>
+<application xmlns="http://ns.adobe.com/air/application/1.0">
+	<id>com.adobe.spf</id>
 	<filename>SPF</filename>
 	<name>SPF</name>
 	<version>v1</version>
@@ -12,7 +12,7 @@
 		<title>SPF</title>
 		<systemChrome>standard</systemChrome>
 		<transparent>false</transparent>
-		<visible>true</visible>
+		<visible>false</visible>
 		<!--<minimizable></minimizable>-->
 		<!--<maximizable></maximizable>-->
 		<!--<resizable></resizable>-->
