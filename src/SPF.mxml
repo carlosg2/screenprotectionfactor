@@ -240,8 +240,8 @@
 			{
 				var ss:ScreenSaver = new ScreenSaver(this, this.imageFiles, this.pictureTransitionInterval);
 				ss.bounds = screen.visibleBounds;
-				ss.stage.displayState = StageDisplayState.FULL_SCREEN;
 				ss.visible = true;
+				ss.stage.displayState = StageDisplayState.FULL_SCREEN;
 				this.screenSavers.push(ss);
 			}
 			
