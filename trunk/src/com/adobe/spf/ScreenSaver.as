@@ -36,7 +36,7 @@ package com.adobe.spf
 
 			// Configure the parent window
 			var initOpts:NativeWindowInitOptions = new NativeWindowInitOptions();
-			initOpts.type = NativeWindowType.LIGHTWEIGHT;
+			initOpts.type = NativeWindowType.UTILITY;
 			initOpts.systemChrome = NativeWindowSystemChrome.NONE;
 			super(initOpts);
 
