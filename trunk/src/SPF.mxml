@@ -241,7 +241,8 @@
 				var ss:ScreenSaver = new ScreenSaver(this, this.imageFiles, this.pictureTransitionInterval);
 				ss.bounds = screen.visibleBounds;
 				ss.visible = true;
-				ss.stage.displayState = StageDisplayState.FULL_SCREEN;
+				ss.stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+				ss.alwaysInFront = true;
 				this.screenSavers.push(ss);
 			}
 			
