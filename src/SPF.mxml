@@ -108,18 +108,6 @@
 				this.picFolder.getDirectoryListingAsync();
 				this.visible = true;
 			}
-
-			private function onPresenceChange(e:Event):void
-			{
-				if (NativeApplication.nativeApplication.timeSinceLastUserInput > 0)
-				{
-					start();
-				}
-				else
-				{
-					stop();
-				}
-			}
 			
 			private function onDirectorySelected(e:Event):void
 			{
